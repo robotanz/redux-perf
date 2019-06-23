@@ -1,16 +1,28 @@
+import React from 'react'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
+import { startTime, logElapsed } from './Timeter'
 
 const Square = styled.div`
   width: 20px;
   height: 20px;
   background-color: ${props => props.color};
-  border: 1px;
+  border: 1px solid #112233;
   :hover {
-    background-color: darkgray;
+    background-color: #223344;
   }
 `
 
+class PureSquare extends React.PureComponent {
+  render() { 
+    return ( <Square { ...this.props } /> );
+  }
+
+  componentDidUpdate() {
+    logElapsed()
+  }
+}
+ 
 const selector = (state, item) => {
   const i = state.items[item]
   return i && i.selected ? '#112233' : "#111111"
@@ -21,8 +33,11 @@ const mapStateToProps = (state, ownProps) => ({
 })
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  onClick: () => dispatch({ type: 'SELECT', item: ownProps.item }),
+  onClick: () => {
+    startTime()
+    dispatch({ type: 'SELECT', item: ownProps.item })
+  },
 })
 
-const ConnectedSquare = connect(mapStateToProps, mapDispatchToProps)(Square)
+const ConnectedSquare = connect(mapStateToProps, mapDispatchToProps)(PureSquare)
 export default ConnectedSquare
